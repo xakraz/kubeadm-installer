@@ -10,7 +10,7 @@ CNI_BIN_DIR=${CNI_BIN_DIR:-/opt/cni}
 if [[ $1 == "coreos" ]]; then
 	BIN_DIR=${BIN_DIR:-/opt/bin}
 	KUBELET_EXEC=${KUBELET_EXEC:-/usr/lib/coreos/kubelet-wrapper}
-	EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"RKT_OPTS=--volume opt-cni,kind=host,source=/opt/cni --mount volume=opt-cni,target=/opt/cni --volume etc-cni,kind=host,source=/etc/cni --mount volume=etc-cni,target=/etc/cni"}
+	EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"RKT_RUN_ARGS=--volume opt-cni,kind=host,source=/opt/cni --mount volume=opt-cni,target=/opt/cni --volume etc-cni,kind=host,source=/etc/cni --mount volume=etc-cni,target=/etc/cni"}
 elif [[ $1 == "ubuntu" || $1 == "debian" || $1 == "fedora" || $1 == "centos" ]]; then
 	BIN_DIR=${BIN_DIR:-/usr/bin}
 	KUBELET_EXEC=${KUBELET_EXEC:-${BIN_DIR}/kubelet}
@@ -76,7 +76,7 @@ if [[ ! -f ${ROOTFS}/etc/systemd/system/kubelet.service ]]; then
 	Documentation=http://kubernetes.io/docs/
 
 	[Service]
-	Environment="KUBELET_VERSION=${K8S_VERSION}_coreos.0"
+	Environment="KUBELET_IMAGE_TAG=${K8S_VERSION}_coreos.0"
 	Environment="${EXTRA_ENVIRONMENT}"
 	ExecStart=${KUBELET_EXEC} --kubeconfig=/etc/kubernetes/kubelet.conf --require-kubeconfig=true --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=10.96.0.10 --cluster-domain=cluster.local
 	Restart=always
