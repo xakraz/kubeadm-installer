@@ -1,4 +1,4 @@
 FROM alpine
 RUN apk --update add bash curl ca-certificates
-COPY entrypoint.sh /
+COPY files/entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
