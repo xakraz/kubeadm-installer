@@ -7,6 +7,21 @@ CNI_RELEASE=${CNI_RELEASE:-07a8a28637e97b22eb8dfe710eeae1344f69d16e}
 ARCH=${ARCH:-amd64}
 CNI_BIN_DIR=${CNI_BIN_DIR:-/opt/cni}
 
+K8S_URL=${K8S_URL:-https://storage.googleapis.com/kubernetes-release/release}
+CNI_URL=${CNI_URL:-https://storage.googleapis.com/kubernetes-release/network-plugins}
+
+echo "Installing kubeadm version: ${KUBEADM_RELEASE}"
+if [[ -z "${KUBEADM_URL}" ]]; then
+  if [[ -n "${KUBEADM_VERSION/v[0-9].[0-9].[0-9]/}" ]]; then
+    echo "Kubeadm: is a Git version"
+    KUBEADM_URL=https://storage.googleapis.com/kubernetes-release-dev/ci-cross
+  else
+    echo "Kubeadm: is a Release version"
+    KUBEADM_URL=https://storage.googleapis.com/kubernetes-release/release
+  fi
+fi
+echo "Kubeadm: Download url - ${KUBEADM_URL}"
+
 if [[ $1 == "coreos" ]]; then
 	BIN_DIR=${BIN_DIR:-/opt/bin}
 	KUBELET_EXEC=${KUBELET_EXEC:-/usr/lib/coreos/kubelet-wrapper}
@@ -38,7 +53,7 @@ fi
 mkdir -p ${ROOTFS}/etc/cni ${ROOTFS}/${BIN_DIR}
 
 if [[ ! -f ${ROOTFS}/${BIN_DIR}/kubectl ]]; then
-	curl -sSL https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/${ARCH}/kubectl > ${ROOTFS}/${BIN_DIR}/kubectl
+	curl -sSL ${K8S_URL}/${K8S_VERSION}/bin/linux/${ARCH}/kubectl > ${ROOTFS}/${BIN_DIR}/kubectl
 	chmod +x ${ROOTFS}/${BIN_DIR}/kubectl
 	echo "Installed kubectl in ${BIN_DIR}/kubectl"
 else
@@ -46,7 +61,7 @@ else
 fi
 
 if [[ ! -f ${ROOTFS}/${BIN_DIR}/kubelet && ${INSTALL_KUBELET} == 1 ]]; then
-	curl -sSL https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/${ARCH}/kubelet > ${ROOTFS}/${BIN_DIR}/kubelet
+	curl -sSL ${K8S_URL}/${K8S_VERSION}/bin/linux/${ARCH}/kubelet > ${ROOTFS}/${BIN_DIR}/kubelet
 	chmod +x ${ROOTFS}/${BIN_DIR}/kubelet
 	echo "Installed kubelet in ${BIN_DIR}/kubelet"
 else
@@ -54,7 +69,7 @@ else
 fi
 
 if [[ ! -f ${ROOTFS}/${BIN_DIR}/kubeadm ]]; then
-	curl -sSL https://storage.googleapis.com/kubernetes-release-dev/ci-cross/${KUBEADM_RELEASE}/bin/linux/${ARCH}/kubeadm > ${ROOTFS}/${BIN_DIR}/kubeadm
+	curl -sSL ${KUBEADM_URL}/${KUBEADM_RELEASE}/bin/linux/${ARCH}/kubeadm > ${ROOTFS}/${BIN_DIR}/kubeadm
 	chmod +x ${ROOTFS}/${BIN_DIR}/kubeadm
 	echo "Installed kubeadm in ${BIN_DIR}/kubeadm"
 else
@@ -63,7 +78,7 @@ fi
 
 if [[ ! -d ${ROOTFS}/${CNI_BIN_DIR} ]]; then
 	mkdir -p ${ROOTFS}/${CNI_BIN_DIR}
-	curl -sSL https://storage.googleapis.com/kubernetes-release/network-plugins/cni-${ARCH}-${CNI_RELEASE}.tar.gz | tar -xz -C ${ROOTFS}/${CNI_BIN_DIR}
+	curl -sSL ${CNI_URL}/cni-${ARCH}-${CNI_RELEASE}.tar.gz | tar -xz -C ${ROOTFS}/${CNI_BIN_DIR}
 	echo "Installed CNI binaries in /opt/cni"
 else
 	echo "Ignoring /opt/cni, since it seems to exist already"
