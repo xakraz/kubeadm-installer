@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -11,8 +11,14 @@ PUSH=${PUSH:-0}
 
 set -u
 
-PROJECT_DIR="$(git rev-parse --show-toplevel)"
+# Workaround since Docker does not support SEMVER for tags
+# Especially the '+'
+#
+# https://github.com/docker/distribution/pull/1202
+KUBEADM_VERSION=${KUBEADM_VERSION/+/-g}
 
+
+PROJECT_DIR="$(git rev-parse --show-toplevel)"
 pushd ${PROJECT_DIR}
 docker build \
   -t ${REPO}:${KUBEADM_VERSION}.${KUBEADM_REVISION} \
