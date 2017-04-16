@@ -6,6 +6,8 @@
 #
 # These values can be overridden by ENV Vars
 #
+K8S_REPO="kubernetes/kubernetes"
+
 # Example
 #K8S_VERSION=${K8S_VERSION:-v1.6.1}
 K8S_VERSION=${K8S_VERSION:-}
@@ -14,24 +16,41 @@ K8S_VERSION=${K8S_VERSION:-}
 #KUBEADM_RELEASE=${KUBEADM_RELEASE:-v1.6.0-alpha.0.2074+a092d8e0f95f52}
 KUBEADM_RELEASE=${KUBEADM_RELEASE:-}
 
-CNI_RELEASE=${CNI_RELEASE:-07a8a28637e97b22eb8dfe710eeae1344f69d16e}
+# Example
+#CNI_RELEASE=${CNI_RELEASE:-07a8a28637e97b22eb8dfe710eeae1344f69d16e}
+CNI_RELEASE=${CNI_RELEASE:-}
+CNI_REPO="containernetworking/cni"
 
+# Installer variables
 ARCH=${ARCH:-amd64}
 CNI_BIN_DIR=${CNI_BIN_DIR:-/opt/cni}
 ROOTFS=${ROOTFS:-/rootfs}
 
-# If no values are provided, get the latest release of k8s
-if [[ -z "${K8S_VERSION}" ]]; then
-  K8S_VERSION=$(
-    curl --silent "https://api.github.com/repos/kubernetes/kubernetes/releases/latest" \
+
+# Helpers
+# --
+get_git_latest_release() {
+  curl --silent "https://api.github.com/repos/${1}/releases/latest" \
     | grep '"tag_name":' \
     | sed -E 's/.*"([^"]+)".*/\1/'
-  )
+}
+
+
+# Handle no values
+# --
+# If no values are provided, get the latest release of k8s
+if [[ -z "${K8S_VERSION}" ]]; then
+  K8S_VERSION=$(get_git_latest_release $K8S_REPO)
 fi
 
 # If no values are provided, use the same than k8s
 if [[ -z "${KUBEADM_RELEASE}" ]]; then
   KUBEADM_RELEASE=${K8S_VERSION}
+fi
+
+# If no values are provided, get the latest release of CNI
+if [[ -z "${CNI_RELEASE}" ]]; then
+  CNI_RELEASE=$(get_git_latest_release $CNI_REPO)
 fi
 
 
