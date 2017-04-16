@@ -6,13 +6,33 @@
 #
 # These values can be overridden by ENV Vars
 #
-K8S_VERSION=${K8S_VERSION:-v1.6.1}
-KUBEADM_RELEASE=${KUBEADM_RELEASE:-v1.6.0-alpha.0.2074+a092d8e0f95f52}
+# Example
+#K8S_VERSION=${K8S_VERSION:-v1.6.1}
+K8S_VERSION=${K8S_VERSION:-}
+
+# Example
+#KUBEADM_RELEASE=${KUBEADM_RELEASE:-v1.6.0-alpha.0.2074+a092d8e0f95f52}
+KUBEADM_RELEASE=${KUBEADM_RELEASE:-}
+
 CNI_RELEASE=${CNI_RELEASE:-07a8a28637e97b22eb8dfe710eeae1344f69d16e}
 
 ARCH=${ARCH:-amd64}
 CNI_BIN_DIR=${CNI_BIN_DIR:-/opt/cni}
 ROOTFS=${ROOTFS:-/rootfs}
+
+# If no values are provided, get the latest release of k8s
+if [[ -z "${K8S_VERSION}" ]]; then
+  K8S_VERSION=$(
+    curl --silent "https://api.github.com/repos/kubernetes/kubernetes/releases/latest" \
+    | grep '"tag_name":' \
+    | sed -E 's/.*"([^"]+)".*/\1/'
+  )
+fi
+
+# If no values are provided, use the same than k8s
+if [[ -z "${KUBEADM_RELEASE}" ]]; then
+  KUBEADM_RELEASE=${K8S_VERSION}
+fi
 
 
 # Kubernetes Google Cloud Storage
