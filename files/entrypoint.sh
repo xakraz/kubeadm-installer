@@ -92,20 +92,32 @@ elif [[ $1 == "ubuntu" || $1 == "debian" || $1 == "fedora" || $1 == "centos" ]];
 else
   cat <<-EOF
   Hi, you should run this container like this:
-  docker run -it -v /etc/cni:/etc/cni -v /etc/systemd:/etc/systemd -v /opt:/opt -v /usr/bin:/usr/bin luxas/kubeadm-installer your_os_here
+  docker run -it \
+    -v /etc/:/rootfs/etc \
+    -v /usr:/rootfs/usr \
+    -v /opt:/rootfs/opt \
+    luxas/kubeadm-installer your_os_here
 
   your_os_here can be coreos, ubuntu, debian, fedora or centos
 
   You can also revert this action with running:
-  docker run -it -v /etc/:/rootfs/etc -v /usr:/rootfs/usr -v /opt:/rootfs/opt luxas/kubeadm-installer uninstall
+  docker run -it \
+    -v /etc/:/rootfs/etc \
+    -v /usr:/rootfs/usr \
+    -v /opt:/rootfs/opt \
+    luxas/kubeadm-installer uninstall
   EOF
   exit 1
 fi
 
 
 if [[ $2 == "uninstall" ]]; then
-  rm -rf ${ROOTFS}/etc/cni ${ROOTFS}/${BIN_DIR}/kubectl ${ROOTFS}/${BIN_DIR}/kubelet ${ROOTFS}/${BIN_DIR}/kubeadm ${ROOTFS}/${CNI_BIN_DIR} ${ROOTFS}/etc/systemd/system/kubelet.service
-  echo "Removed /etc/cni, ${BIN_DIR}/kubectl, ${BIN_DIR}/kubelet, ${BIN_DIR}/kubeadm, /opt/cni and /etc/systemd/system/kubelet.service"
+  rm -rfv ${ROOTFS}/etc/cni \
+    ${ROOTFS}/${BIN_DIR}/kubectl \
+    ${ROOTFS}/${BIN_DIR}/kubelet \
+    ${ROOTFS}/${BIN_DIR}/kubeadm \
+    ${ROOTFS}/${CNI_BIN_DIR} \
+    ${ROOTFS}/etc/systemd/system/kubelet.service
   exit 1
 fi
 
