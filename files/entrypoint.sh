@@ -83,14 +83,20 @@ echo "Kubeadm: Download url - ${KUBEADM_URL}"
 if [[ $1 == "coreos" ]]; then
   BIN_DIR=${BIN_DIR:-/opt/bin}
   KUBELET_EXEC=${KUBELET_EXEC:-/usr/lib/coreos/kubelet-wrapper}
-  EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"RKT_RUN_ARGS=--volume opt-cni,kind=host,source=/opt/cni --mount volume=opt-cni,target=/opt/cni --volume etc-cni,kind=host,source=/etc/cni --mount volume=etc-cni,target=/etc/cni"}
+  EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"RKT_RUN_ARGS=\
+--volume opt-cni,kind=host,source=/opt/cni \
+--mount volume=opt-cni,target=/opt/cni \
+--volume etc-cni,kind=host,source=/etc/cni \
+--mount volume=etc-cni,target=/etc/cni"}
+
 elif [[ $1 == "ubuntu" || $1 == "debian" || $1 == "fedora" || $1 == "centos" ]]; then
   BIN_DIR=${BIN_DIR:-/usr/bin}
   KUBELET_EXEC=${KUBELET_EXEC:-${BIN_DIR}/kubelet}
   EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"NOOP=true"}
   INSTALL_KUBELET=1
+
 else
-  cat <<-EOF
+cat <<-EOF
   Hi, you should run this container like this:
   docker run -it \
     -v /etc/:/rootfs/etc \
@@ -106,8 +112,8 @@ else
     -v /usr:/rootfs/usr \
     -v /opt:/rootfs/opt \
     luxas/kubeadm-installer uninstall
-  EOF
-  exit 1
+EOF
+exit 1
 fi
 
 
