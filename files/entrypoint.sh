@@ -130,6 +130,7 @@ if [[ $1 == "coreos" ]]; then
 --mount volume=opt-cni,target=/opt/cni \
 --volume etc-cni,kind=host,source=/etc/cni \
 --mount volume=etc-cni,target=/etc/cni"}
+  INSTALL_KUBELET=0
 
 elif [[ $1 == "ubuntu" || $1 == "debian" || $1 == "fedora" || $1 == "centos" ]]; then
   BIN_DIR=${BIN_DIR:-/usr/bin}
