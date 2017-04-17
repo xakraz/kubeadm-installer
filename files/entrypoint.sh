@@ -35,6 +35,28 @@ get_git_latest_release() {
     | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
+print_systemd() {
+	echo $FUNCNAME $@
+	local action=$1
+
+	[[ install == "$action" ]] \
+  	&& cat <<- EOF
+	Done! Now run this in your terminal to enable docker and kubelet:
+
+	systemctl daemon-reload
+	systemctl enable docker kubelet
+	systemctl restart docker kubelet
+	EOF
+
+	[[ uninstall == "$action" ]] \
+  	&& cat <<- EOF
+	Done! Now run this in your terminal to complet uninstall:
+
+	systemctl daemon-reload
+	systemctl disable kubelet
+	EOF
+}
+
 
 # Handle no values
 # --
@@ -117,7 +139,7 @@ cat <<-EOF
     -v /etc/:/rootfs/etc \
     -v /usr:/rootfs/usr \
     -v /opt:/rootfs/opt \
-    luxas/kubeadm-installer uninstall
+    luxas/kubeadm-installer your_os_here uninstall
 EOF
 exit 1
 fi
@@ -130,6 +152,8 @@ if [[ $2 == "uninstall" ]]; then
     ${ROOTFS}/${BIN_DIR}/kubeadm \
     ${ROOTFS}/${CNI_BIN_DIR} \
     ${ROOTFS}/etc/systemd/system/kubelet.service
+
+	print_systemd uninstall
   exit 1
 fi
 
@@ -200,11 +224,4 @@ else
   echo "Ignoring /etc/systemd/system/kubelet.service, since it seems to exist already"
 fi
 
-
-cat <<EOF
-Done! Now run this in your terminal to enable docker and kubelet:
-
-systemctl daemon-reload
-systemctl enable docker kubelet
-systemctl restart docker kubelet
-EOF
+print_systemd install
