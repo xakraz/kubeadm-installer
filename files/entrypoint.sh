@@ -194,7 +194,7 @@ if [[ ! -f ${ROOTFS}/etc/systemd/system/kubelet.service ]]; then
 
   [Install]
   WantedBy=multi-user.target
-  EOF
+EOF
   echo "Installed the kubelet.service in /etc/systemd/system/kubelet.service"
 else
   echo "Ignoring /etc/systemd/system/kubelet.service, since it seems to exist already"
