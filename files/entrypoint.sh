@@ -58,7 +58,7 @@ print_systemd() {
 }
 
 
-# Handle no values
+# Handle no values for Versions
 # --
 # If no values are provided, get the latest release of k8s
 if [[ -z "${K8S_VERSION}" ]]; then
@@ -88,9 +88,8 @@ echo "[ENV] 'CNI_RELEASE' = ${CNI_RELEASE}"
 # Handling usage of Dev / Final release buckets
 #
 K8S_URL=${K8S_URL:-https://storage.googleapis.com/kubernetes-release/release}
-CNI_URL=${CNI_URL:-https://storage.googleapis.com/kubernetes-release/network-plugins}
 
-echo "Installing kubeadm version: ${KUBEADM_RELEASE}"
+echo "[Kubeadm] Selected version: ${KUBEADM_RELEASE}"
 if [[ -z "${KUBEADM_URL}" ]]; then
   if [[ -n "${KUBEADM_VERSION/v[0-9].[0-9].[0-9]/}" ]]; then
     echo "[Kubeadm] KUBEADM_RELEASE ${KUBEADM_RELEASE} is a Pre-release version"
@@ -101,6 +100,21 @@ if [[ -z "${KUBEADM_URL}" ]]; then
   fi
 fi
 echo "[Kubeadm] Download url: ${KUBEADM_URL}"
+
+# To find out if the CNI_RELEASE is available on Google Cloud Storage:
+# `$ docker run --rm -ti google/cloud-sdk gsutil ls gs://kubernetes-release/network-plugins`
+#
+echo "[CNI] Selected version: ${CNI_RELEASE}"
+if [[ -z "${CNI_URL}" ]]; then
+  if [[ -n "${CNI_RELEASE/v[0-9].[0-9].[0-9]/}" ]]; then
+    echo "[CNI] CNI_RELEASE ${CNI_RELEASE} is a Pre-release version"
+    CNI_URL=https://storage.googleapis.com/kubernetes-release/network-plugins/cni-${ARCH}-${CNI_RELEASE}.tar.gz
+  else
+    echo "[CNI] CNI_RELEASE ${CNI_RELEASE} is a Release version"
+    CNI_URL=https://github.com/${CNI_REPO}/releases/download/${CNI_RELEASE}/cni-${ARCH}-${CNI_RELEASE}.tgz
+  fi
+fi
+echo "[CNI] Download url: ${CNI_URL}"
 
 
 # Linux Distro
@@ -145,6 +159,11 @@ exit 1
 fi
 
 
+# Main
+# --
+set -o errexit
+set -o nounset
+
 if [[ $2 == "uninstall" ]]; then
   rm -rfv ${ROOTFS}/etc/cni \
     ${ROOTFS}/${BIN_DIR}/kubectl \
@@ -158,7 +177,7 @@ if [[ $2 == "uninstall" ]]; then
 fi
 
 
-# Setup
+# Install
 #
 mkdir -p ${ROOTFS}/etc/cni \
   ${ROOTFS}/${BIN_DIR}
@@ -189,7 +208,7 @@ fi
 
 if [[ ! -d ${ROOTFS}/${CNI_BIN_DIR} ]]; then
   mkdir -p ${ROOTFS}/${CNI_BIN_DIR}
-  curl -sSL ${CNI_URL}/cni-${ARCH}-${CNI_RELEASE}.tar.gz | tar -xz -C ${ROOTFS}/${CNI_BIN_DIR}
+  curl -sSL ${CNI_URL} | tar -xz -C ${ROOTFS}/${CNI_BIN_DIR}
   echo "Installed CNI binaries in /opt/cni"
 else
   echo "Ignoring /opt/cni, since it seems to exist already"
