@@ -145,7 +145,7 @@ cat <<-EOF
     -v /etc/:/rootfs/etc \
     -v /usr:/rootfs/usr \
     -v /opt:/rootfs/opt \
-    luxas/kubeadm-installer your_os_here
+    xakra/kubeadm-installer your_os_here
 
   your_os_here can be coreos, ubuntu, debian, fedora or centos
 
@@ -154,7 +154,7 @@ cat <<-EOF
     -v /etc/:/rootfs/etc \
     -v /usr:/rootfs/usr \
     -v /opt:/rootfs/opt \
-    luxas/kubeadm-installer your_os_here uninstall
+    xakra/kubeadm-installer your_os_here uninstall
 EOF
 exit 1
 fi
@@ -165,7 +165,7 @@ fi
 set -o errexit
 set -o nounset
 
-if [[ $2 == "uninstall" ]]; then
+if [[ $# -gt 2 ]] && [[ $2 == "uninstall" ]]; then
   rm -rfv ${ROOTFS}/etc/cni \
     ${ROOTFS}/${BIN_DIR}/kubectl \
     ${ROOTFS}/${BIN_DIR}/kubelet \
