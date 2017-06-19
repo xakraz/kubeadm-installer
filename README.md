@@ -25,7 +25,7 @@ $ docker run -it \
 	-v /etc:/rootfs/etc \
 	-v /opt:/rootfs/opt \
 	-v /usr/bin:/rootfs/usr/bin \
-	luxas/kubeadm-installer ${your_os_here}
+	xakra/kubeadm-installer ${your_os_here}
 ```
 
 `${your_os_here}` can be `coreos`, `ubuntu`, `debian`, `fedora` or `centos`
@@ -38,7 +38,7 @@ $ docker run -it 	\
 	-v /etc:/rootfs/etc \
 	-v /opt:/rootfs/opt \
 	-v /usr/bin:/rootfs/usr/bin \
-	luxas/kubeadm-installer ${your_os_here} uninstall
+	xakra/kubeadm-installer ${your_os_here} uninstall
 ```
 
 
