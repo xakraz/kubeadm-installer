@@ -165,7 +165,7 @@ fi
 set -o errexit
 set -o nounset
 
-if [[ $# -gt 2 ]] && [[ $2 == "uninstall" ]]; then
+if [[ $# -gt 1 ]] && [[ $2 == "uninstall" ]]; then
   rm -rfv ${ROOTFS}/etc/cni \
     ${ROOTFS}/${BIN_DIR}/kubectl \
     ${ROOTFS}/${BIN_DIR}/kubelet \
