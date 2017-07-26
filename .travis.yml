@@ -1,0 +1,14 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t xakra/kubeadm-installer .
+
+script:
+  - docker run  -it -v /etc:/rootfs/etc -v /opt:/rootfs/opt -v /usr/bin:/rootfs/usr/bin xakra/kubeadm-installer coreos
+  - docker run  -it -v /etc:/rootfs/etc -v /opt:/rootfs/opt -v /usr/bin:/rootfs/usr/bin xakra/kubeadm-installer coreos uninstall
+  - docker run  -it -v /etc:/rootfs/etc -v /opt:/rootfs/opt -v /usr/bin:/rootfs/usr/bin xakra/kubeadm-installer ubuntu
+  - docker run  -it -v /etc:/rootfs/etc -v /opt:/rootfs/opt -v /usr/bin:/rootfs/usr/bin xakra/kubeadm-installer ubuntu uninstall
+
