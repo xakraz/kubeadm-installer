@@ -1,8 +1,9 @@
 ## kubeadm installer for CoreOS, Ubuntu, Debian, CentOS and Fedora
 
 
-[![Docker Automated buil](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg?style=flat-square)](https://hub.docker.com/r/xakra/kubeadm-installer/)
-[![Docker Build Statu](https://img.shields.io/docker/build/jrottenberg/ffmpeg.svg?style=flat-square)](https://hub.docker.com/r/xakra/kubeadm-installer/)
+[![Build Status](https://travis-ci.org/xakraz/kubeadm-installer.svg?branch=master)](https://travis-ci.org/xakraz/kubeadm-installer)
+[![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg?style=flat-square)](https://hub.docker.com/r/xakra/kubeadm-installer/)
+[![Docker Build Status](https://img.shields.io/docker/build/jrottenberg/ffmpeg.svg?style=flat-square)](https://hub.docker.com/r/xakra/kubeadm-installer/)
 
 
 ### Note

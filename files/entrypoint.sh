@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 
+# Params
+# --
+distro=${1}
+action=${2:-install}
+
+
 # Variables
 # --
 #
@@ -55,6 +61,8 @@ print_systemd() {
 	systemctl daemon-reload
 	systemctl disable kubelet
 	EOF
+
+	exit 0
 }
 
 
@@ -122,7 +130,7 @@ echo "[CNI] Download url: ${CNI_URL}"
 #
 # Environment settings according to Distro
 #
-if [[ $1 == "coreos" ]]; then
+if [[ ${distro} == "coreos" ]]; then
   BIN_DIR=${BIN_DIR:-/opt/bin}
   KUBELET_EXEC=${KUBELET_EXEC:-/usr/lib/coreos/kubelet-wrapper}
   EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"RKT_RUN_ARGS=\
@@ -132,7 +140,7 @@ if [[ $1 == "coreos" ]]; then
 --mount volume=etc-cni,target=/etc/cni"}
   INSTALL_KUBELET=0
 
-elif [[ $1 == "ubuntu" || $1 == "debian" || $1 == "fedora" || $1 == "centos" ]]; then
+elif [[ ${distro} == "ubuntu" || ${distro} == "debian" || ${distro} == "fedora" || ${distro} == "centos" ]]; then
   BIN_DIR=${BIN_DIR:-/usr/bin}
   KUBELET_EXEC=${KUBELET_EXEC:-${BIN_DIR}/kubelet}
   EXTRA_ENVIRONMENT=${EXTRA_ENVIRONMENT:-"NOOP=true"}
@@ -165,7 +173,7 @@ fi
 set -o errexit
 set -o nounset
 
-if [[ $# -gt 1 ]] && [[ $2 == "uninstall" ]]; then
+if [[ ${action} == "uninstall" ]]; then
   rm -rfv ${ROOTFS}/etc/cni \
     ${ROOTFS}/${BIN_DIR}/kubectl \
     ${ROOTFS}/${BIN_DIR}/kubelet \
@@ -174,7 +182,6 @@ if [[ $# -gt 1 ]] && [[ $2 == "uninstall" ]]; then
     ${ROOTFS}/etc/systemd/system/kubelet.service
 
 	print_systemd uninstall
-  exit 1
 fi
 
 
@@ -216,6 +223,8 @@ else
 fi
 
 if [[ ! -f ${ROOTFS}/etc/systemd/system/kubelet.service ]]; then
+  mkdir -p -v ${ROOTFS}/etc/systemd/system/
+
   cat > ${ROOTFS}/etc/systemd/system/kubelet.service <<-EOF
   [Unit]
   Description=kubelet: The Kubernetes Node Agent
