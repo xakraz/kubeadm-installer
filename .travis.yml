@@ -12,3 +12,8 @@ script:
   - docker run  -it -v /etc:/rootfs/etc -v /opt:/rootfs/opt -v /usr/bin:/rootfs/usr/bin xakra/kubeadm-installer ubuntu
   - docker run  -it -v /etc:/rootfs/etc -v /opt:/rootfs/opt -v /usr/bin:/rootfs/usr/bin xakra/kubeadm-installer ubuntu uninstall
 
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push xakra/kubeadm-installer;
+    fi
