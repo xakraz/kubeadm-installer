@@ -61,6 +61,8 @@ print_systemd() {
 	systemctl daemon-reload
 	systemctl disable kubelet
 	EOF
+
+	exit 0
 }
 
 
@@ -180,7 +182,6 @@ if [[ ${action} == "uninstall" ]]; then
     ${ROOTFS}/etc/systemd/system/kubelet.service
 
 	print_systemd uninstall
-  exit 0
 fi
 
 
