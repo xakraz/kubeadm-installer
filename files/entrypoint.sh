@@ -26,6 +26,7 @@ KUBEADM_RELEASE=${KUBEADM_RELEASE:-}
 #CNI_RELEASE=${CNI_RELEASE:-07a8a28637e97b22eb8dfe710eeae1344f69d16e}
 CNI_RELEASE=${CNI_RELEASE:-}
 CNI_REPO="containernetworking/cni"
+CNI_PLUGINS_REPO="containernetworking/plugins"
 
 # Installer variables
 ARCH=${ARCH:-amd64}
@@ -120,9 +121,16 @@ if [[ -z "${CNI_URL}" ]]; then
   else
     echo "[CNI] CNI_RELEASE ${CNI_RELEASE} is a Release version"
     CNI_URL=https://github.com/${CNI_REPO}/releases/download/${CNI_RELEASE}/cni-${ARCH}-${CNI_RELEASE}.tgz
+    if [[ -n "${CNI_RELEASE/v0.[0-5].[0-9]/}" ]]; then
+      CNI_PLUGINS_URL=https://github.com/${CNI_PLUGINS_REPO}/releases/download/${CNI_RELEASE}/cni-plugins-${ARCH}-${CNI_RELEASE}.tgz
+    fi
   fi
 fi
 echo "[CNI] Download url: ${CNI_URL}"
+if [[ -n "${CNI_PLUGINS_URL}" ]]; then
+  echo "[CNI] Plugins download url: ${CNI_PLUGINS_URL}"
+fi
+
 
 
 # Linux Distro
@@ -217,6 +225,9 @@ fi
 if [[ ! -d ${ROOTFS}/${CNI_BIN_DIR} ]]; then
   mkdir -p ${ROOTFS}/${CNI_BIN_DIR}
   curl -sSL ${CNI_URL} | tar -xz -C ${ROOTFS}/${CNI_BIN_DIR}
+  if [[ -n "${CNI_PLUGINS_URL}" ]]; then
+    curl -sSL ${CNI_PLUGINS_URL} | tar -xz -C ${ROOTFS}/${CNI_BIN_DIR}
+  fi
   echo "Installed CNI binaries in /opt/cni"
 else
   echo "Ignoring /opt/cni, since it seems to exist already"
